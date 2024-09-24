@@ -20,7 +20,7 @@ public class DnsHeader {
         // Truncation (TC) - 1 bit
         // Recursion Desired (RD) - 1 bit
 
-        byte QOATR = (byte)(1);
+        byte QOATR = (byte)(1 << 7);
 
 
         //    Recursion Available (RA) - 1 bit
