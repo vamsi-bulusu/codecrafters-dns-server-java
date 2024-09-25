@@ -29,7 +29,6 @@ public class DnsQuestion {
         short Class = 1;
 
         buffResponse = ByteBuffer.allocate(Name.length + 4)
-                .order(ByteOrder.BIG_ENDIAN)
                 .put(Name)
                 .putShort(Type)
                 .putShort(Class).array();
