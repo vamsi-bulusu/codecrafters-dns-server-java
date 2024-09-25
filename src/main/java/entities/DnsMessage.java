@@ -10,7 +10,7 @@ public class DnsMessage {
         byte[] dnsHeader = new DnsHeader().getBufferResponse();
         byte[] dnsQuestion = new DnsQuestion().getBuffResponse();
 
-        buffResponse = ByteBuffer.allocate(dnsHeader.length + dnsQuestion.length)
+        buffResponse = ByteBuffer.allocate(512)
                 .put(dnsHeader)
                 .put(dnsQuestion)
                 .array();
