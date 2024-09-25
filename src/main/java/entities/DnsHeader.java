@@ -38,7 +38,7 @@ public class DnsHeader {
         short NSCOUNT = 0;
         short ARCOUNT = 0;
 
-        buffResponse = ByteBuffer.allocate(512)
+        buffResponse = ByteBuffer.allocate(12)
                 .order(ByteOrder.BIG_ENDIAN)
                 .putShort(ID)
                 .put(QOATR)
