@@ -16,7 +16,6 @@ public class DnsQuestion {
 
          byte[] Name = {12, 99, 111, 100, 101, 99, 114, 97, 102, 116, 101, 114, 115, 2, 105, 111, 0};
 
-        // byte[] Name = encodeDomainName("codecrafters.io");
         // Type: 2-byte int; the type of record (1 for an A record, 5 for a CNAME record etc.)
         short Type = 1; // Set byte order to Big Endian
 
