@@ -31,28 +31,6 @@ public class DnsQuestion {
 
     }
 
-    public byte[] encodeDomainName(String name) {
-        // Initialize ByteArrayOutputStream outside of the try block
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        try {
-            // Split the domain name by "."
-            for (String label : name.split("\\.")) {
-                // Write the length of the label
-                byteArrayOutputStream.write(label.length());
-                // Write the label bytes
-                byteArrayOutputStream.write(label.getBytes());
-            }
-            // Write a zero byte to indicate the end of the domain name
-            byteArrayOutputStream.write(0);
-
-
-            // Return the byte array
-            return byteArrayOutputStream.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
         public byte[] getBuffResponse() {
         return Arrays.copyOf(buffResponse, buffResponse.length);
     }
