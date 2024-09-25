@@ -1,5 +1,7 @@
 package entities;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -7,13 +9,13 @@ import java.util.Arrays;
 public class DnsQuestion {
 
     private final byte[] buffResponse;
-    public DnsQuestion(){
+    public DnsQuestion() throws IOException {
         // Name - A domain name, represented as a sequence of "labels"
         // Labels are encoded as <length><content>, where <length> is a single byte that specifies the length of the label,
         // and <content> is the actual content of the label. The sequence of labels is terminated by a null byte (\x00).
 
-        byte[] Name = {12, 99, 111, 100, 101, 99, 114, 97, 102, 116, 101, 114, 115, 2, 105, 111, 0};
-
+//        byte[] Name = {12, 99, 111, 100, 101, 99, 114, 97, 102, 116, 101, 114, 115, 2, 105, 111, 0};
+        byte[] Name = encodeDomainName("codecrafters.io");
         // Type: 2-byte int; the type of record (1 for an A record, 5 for a CNAME record etc.)
         short Type = 1; // Set byte order to Big Endian
 
@@ -27,6 +29,15 @@ public class DnsQuestion {
                 .putShort(Type)
                 .putShort(Class).array();
 
+    }
+
+    public byte[] encodeDomainName(String name) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        for(String label: name.split("\\.")){
+            byteArrayOutputStream.write(label.length());
+            byteArrayOutputStream.write(label.getBytes());
+        }
+        return byteArrayOutputStream.toByteArray();
     }
     public byte[] getBuffResponse() {
         return Arrays.copyOf(buffResponse, buffResponse.length);
