@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class DnsHeader {
 
-    private final byte[] bufferResponse;
+    private final byte[] buffResponse;
     public DnsHeader(){
 
         // Packet Identifier (ID) - 16 bits - 2 bytes
@@ -23,9 +23,9 @@ public class DnsHeader {
         byte QOATR = (byte)(1 << 7);
 
 
-        //    Recursion Available (RA) - 1 bit
-        //    Reserved (Z) - - 3 bits
-        //    Response Code (RCODE) - 4 bits
+        //  Recursion Available (RA) - 1 bit
+        //  Reserved (Z) - - 3 bits
+        //  Response Code (RCODE) - 4 bits
         byte RZR = 0;
 
         //  Question Count (QDCOUNT) - 2 bytes
@@ -33,12 +33,12 @@ public class DnsHeader {
         //  Authority Record Count (NSCOUNT) - 2 bytes
         //  Additional Record Count (ARCOUNT) - 2 bytes
 
-        short QDCOUNT = 0;
+        short QDCOUNT = 1;
         short ANCOUNT = 0;
         short NSCOUNT = 0;
         short ARCOUNT = 0;
 
-        bufferResponse = ByteBuffer.allocate(512)
+        buffResponse = ByteBuffer.allocate(512)
                 .order(ByteOrder.BIG_ENDIAN)
                 .putShort(ID)
                 .put(QOATR)
@@ -51,6 +51,6 @@ public class DnsHeader {
 
     }
     public byte[] getBufferResponse() {
-        return Arrays.copyOf(bufferResponse, bufferResponse.length);
+        return Arrays.copyOf(buffResponse, buffResponse.length);
     }
 }
