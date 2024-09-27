@@ -34,7 +34,7 @@ public class DnsHeader {
         //  Additional Record Count (ARCOUNT) - 2 bytes
 
         short QDCOUNT = 1;
-        short ANCOUNT = 0;
+        short ANCOUNT = 1;
         short NSCOUNT = 0;
         short ARCOUNT = 0;
 
