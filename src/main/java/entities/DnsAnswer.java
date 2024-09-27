@@ -16,7 +16,6 @@ public class DnsAnswer {
         }
 
     }
-
     public byte[] getBuffResponse() {
         return Arrays.copyOf(buffResponse, buffResponse.length);
     }
