@@ -35,7 +35,7 @@ public class DnsParser {
 
         // Set QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT to example values
         dnsHeader.setQDCOUNT((short) 1);  // Example value, adjust as necessary
-        dnsHeader.setANCOUNT((short) 0);
+        dnsHeader.setANCOUNT((short) 1);
         dnsHeader.setNSCOUNT((short) 0);
         dnsHeader.setARCOUNT((short) 0);
 
