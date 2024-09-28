@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Handler {
-    public static byte[] handle(byte[] query) {
+    public static List<Packet> handle(byte[] query) {
+        List<Packet> packets = new ArrayList<>();
         // Parse Header from the incoming DNS query
         Header header = QParser.parseHeader(query);
 
@@ -26,12 +27,15 @@ public class Handler {
 
             // Add the parsed answer to the answer list
             answerList.add(answer);
+            header.setQdcount((short) questionList.size());
+            header.setAncount((short) answerList.size());
+
+            packets.add(new Packet(header, question, answer));
         }
         header.setQdcount((short) questionList.size());
         header.setAncount((short) answerList.size());
         // Build the DNS response packet from the header, questions, and answers
-        Packet packet = new Packet(header, questionList, answerList);
-        return packet.build();
+        return packets;
     }
     public static int getAnswerStartPosition(byte[] packet) {
         ByteBuffer buffer = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN);

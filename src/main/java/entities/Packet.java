@@ -6,30 +6,21 @@ import java.util.List;
 
 public class Packet {
     private final Header header;
-    private final List<Question> questionList;
+    private final Question question;
 
-    private final List<Answer> answerList;
+    private final Answer answer;
 
-    public Packet(Header header, List<Question> questionList, List<Answer> answerList){
+    public Packet(Header header, Question question, Answer answer){
         this.header = header;
-        this.questionList = questionList;
-        this.answerList = answerList;
+        this.question = question;
+        this.answer = answer;
     }
     public byte[] build(){
-        // put header
         ByteBuffer byteBuffer = ByteBuffer.allocate(512)
-                .order(ByteOrder.BIG_ENDIAN);
-
-        byteBuffer.put(header.getBuffResponse());
-        // put questionList
-        for(Question question: questionList){
-            byteBuffer = byteBuffer.put(question.getBuffResponse());
-        }
-
-        // put answerList
-        for(Answer answer: answerList){
-            byteBuffer = byteBuffer.put(answer.getBuffResponse());
-        }
+                .order(ByteOrder.BIG_ENDIAN)
+                .put(header.getBuffResponse())
+                .put(question.getBuffResponse())
+                .put(answer.getBuffResponse());
 
         return byteBuffer.array();
     }

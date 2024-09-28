@@ -1,9 +1,11 @@
 import entities.Handler;
+import entities.Packet;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.Arrays;
+import java.util.List;
 
 public class Main {
   public static void main(String[] args){
@@ -18,11 +20,12 @@ public class Main {
 
          System.out.println("Received data: " + Arrays.toString(packet.getData()));
 
-         byte[] bufResponse = Handler.handle(packet.getData());
+         List<Packet> responsePackets = Handler.handle(packet.getData());
 
-         System.out.println("Parsed data: " + Arrays.toString(bufResponse) + " " +  bufResponse.length);
-         final DatagramPacket packetResponse = new DatagramPacket(bufResponse, bufResponse.length, packet.getSocketAddress());
-         serverSocket.send(packetResponse);
+         for(Packet p: responsePackets){
+             final DatagramPacket packetResponse = new DatagramPacket(p.build(), p.build().length, packet.getSocketAddress());
+             serverSocket.send(packetResponse);
+         }
        }
      } catch (IOException e) {
          System.out.println("IOException: " + e.getMessage());
