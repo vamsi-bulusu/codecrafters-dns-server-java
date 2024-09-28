@@ -61,7 +61,7 @@ public class QParser {
             dnsQuestion.setName(domainName.toString());
 
             // Parse Type (16 bits)
-            if (buffer.remaining() < 4) break; // Ensure there's enough data left
+            if (buffer.remaining() < 4 || domainName.isEmpty()) break; // Ensure there's enough data left
             dnsQuestion.setType(buffer.getShort());
 
             // Parse Class (16 bits)
