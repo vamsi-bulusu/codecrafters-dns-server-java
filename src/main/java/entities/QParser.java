@@ -13,37 +13,34 @@ public class QParser {
         Header dnsHeader = new Header();
         ByteBuffer buffer = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN);
 
-        // Parse and mimic the packet ID from the request
+        // Parse Packet ID
         dnsHeader.setID(buffer.getShort());
 
-        // Read the flags (QOATR and RZR)
-        dnsHeader.setQOATR(buffer.get());
-        dnsHeader.setRZR(buffer.get());
+        // Parse the flags
+        byte QOATR = buffer.get();
+        byte RZR = buffer.get();
 
-        // Set QR to 1 (response)
-        dnsHeader.setQR(true);
+        // Set individual flags from the QOATR byte
+        dnsHeader.setQR((QOATR & 0x80) != 0);              // QR is the highest bit (bit 7)
+        dnsHeader.setOPCODE((QOATR >> 3) & 0x0F);          // OPCODE is bits 3-6
+        dnsHeader.setAA((QOATR & 0x04) != 0);              // AA is bit 2
+        dnsHeader.setTC((QOATR & 0x02) != 0);              // TC is bit 1
+        dnsHeader.setRD((QOATR & 0x01) != 0);              // RD is bit 0
 
-        // Mimic the OPCODE from the request
-        int opcode = (dnsHeader.getQOATR() >> 3) & 0x0F; // Extract OPCODE from the QOATR
-        dnsHeader.setOPCODE(opcode);
+        // Set individual flags from the RZR byte
+        dnsHeader.setRA((RZR & 0x80) != 0);                // RA is the highest bit (bit 7)
+        dnsHeader.setZ((RZR >> 4) & 0x07);                 // Z is bits 4-6
+        dnsHeader.setRCODE(RZR & 0x0F);                    // RCODE is bits 0-3
 
-        // Set static values for AA, TC, RA, and Z based on your requirements
-        dnsHeader.setAA(false);  // Set AA to 0
-        dnsHeader.setTC(false);  // Set TC to 0
-        dnsHeader.setRA(false);  // Set RA to 0
-        dnsHeader.setZ(0);       // Set Z to 0
-
-        // Set RCODE based on specific logic or error state
-        dnsHeader.setRCODE(0);   // Assuming 0 for no error; adjust logic as necessary
-
-        // Set QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT based on your logic
-        dnsHeader.setQDCOUNT((short) 0);  // Example value, adjust as necessary
-        dnsHeader.setANCOUNT((short) 0);
-        dnsHeader.setNSCOUNT((short) 0);
-        dnsHeader.setARCOUNT((short) 0);
+        // Parse section counts
+        dnsHeader.setQDCOUNT(buffer.getShort());
+        dnsHeader.setANCOUNT(buffer.getShort());
+        dnsHeader.setNSCOUNT(buffer.getShort());
+        dnsHeader.setARCOUNT(buffer.getShort());
 
         return dnsHeader;
     }
+
 
     public static List<Question> parseQuestions(byte[] packet) {
         ByteBuffer buffer = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN);

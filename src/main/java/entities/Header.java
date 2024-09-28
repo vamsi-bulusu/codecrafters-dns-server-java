@@ -8,9 +8,17 @@ public class Header {
     // 16-bit Packet Identifier (ID)
     private short ID;
 
-    // Flags stored in two bytes
-    private byte QOATR; // QR, OPCODE, AA, TC, RD
-    private byte RZR;   // RA, Z, RCODE
+    // QR (1 bit), OPCODE (4 bits), AA (1 bit), TC (1 bit), RD (1 bit) stored in one byte
+    private boolean QR;
+    private int OPCODE;
+    private boolean AA;
+    private boolean TC;
+    private boolean RD;
+
+    // RA (1 bit), Z (3 bits), RCODE (4 bits) stored in one byte
+    private boolean RA;
+    private int Z;
+    private int RCODE;
 
     // 16-bit counts for various sections of the DNS packet
     private short QDCOUNT;
@@ -19,6 +27,8 @@ public class Header {
     private short ARCOUNT;
 
     // Getters and Setters
+
+    // Packet Identifier (ID)
     public short getID() {
         return ID;
     }
@@ -27,22 +37,79 @@ public class Header {
         this.ID = ID;
     }
 
-    public byte getQOATR() {
-        return QOATR;
+    // QR (1 bit)
+    public boolean isQR() {
+        return QR;
     }
 
-    public void setQOATR(byte QOATR) {
-        this.QOATR = QOATR;
+    public void setQR(boolean QR) {
+        this.QR = QR;
     }
 
-    public byte getRZR() {
-        return RZR;
+    // OPCODE (4 bits)
+    public int getOPCODE() {
+        return OPCODE;
     }
 
-    public void setRZR(byte RZR) {
-        this.RZR = RZR;
+    public void setOPCODE(int OPCODE) {
+        this.OPCODE = OPCODE & 0x0F; // Ensure it's within 4 bits
     }
 
+    // AA (1 bit)
+    public boolean isAA() {
+        return AA;
+    }
+
+    public void setAA(boolean AA) {
+        this.AA = AA;
+    }
+
+    // TC (1 bit)
+    public boolean isTC() {
+        return TC;
+    }
+
+    public void setTC(boolean TC) {
+        this.TC = TC;
+    }
+
+    // RD (1 bit)
+    public boolean isRD() {
+        return RD;
+    }
+
+    public void setRD(boolean RD) {
+        this.RD = RD;
+    }
+
+    // RA (1 bit)
+    public boolean isRA() {
+        return RA;
+    }
+
+    public void setRA(boolean RA) {
+        this.RA = RA;
+    }
+
+    // Z (3 bits)
+    public int getZ() {
+        return Z;
+    }
+
+    public void setZ(int Z) {
+        this.Z = Z & 0x07; // Ensure it's within 3 bits
+    }
+
+    // RCODE (4 bits)
+    public int getRCODE() {
+        return RCODE;
+    }
+
+    public void setRCODE(int RCODE) {
+        this.RCODE = RCODE & 0x0F; // Ensure it's within 4 bits
+    }
+
+    // QDCOUNT
     public short getQDCOUNT() {
         return QDCOUNT;
     }
@@ -51,6 +118,7 @@ public class Header {
         this.QDCOUNT = QDCOUNT;
     }
 
+    // ANCOUNT
     public short getANCOUNT() {
         return ANCOUNT;
     }
@@ -59,6 +127,7 @@ public class Header {
         this.ANCOUNT = ANCOUNT;
     }
 
+    // NSCOUNT
     public short getNSCOUNT() {
         return NSCOUNT;
     }
@@ -67,6 +136,7 @@ public class Header {
         this.NSCOUNT = NSCOUNT;
     }
 
+    // ARCOUNT
     public short getARCOUNT() {
         return ARCOUNT;
     }
@@ -75,68 +145,32 @@ public class Header {
         this.ARCOUNT = ARCOUNT;
     }
 
-    // Bit manipulation helper methods
-    private byte setBit(byte b, int position, boolean value) {
-        return value ? (byte) (b | (1 << position)) : (byte) (b & ~(1 << position));
-    }
-
-    private boolean getBit(byte b, int position) {
-        return (b & (1 << position)) != 0;
-    }
-
-    // Set QR flag (1 for response)
-    public void setQR(boolean isResponse) {
-        QOATR = setBit(QOATR, 7, isResponse); // QR is the highest bit
-    }
-
-    // Set OPCODE value (4 bits)
-    public void setOPCODE(int opcode) {
-        QOATR = (byte) (QOATR & 0x87); // Clear OPCODE bits (111 0000)
-        QOATR = (byte) (QOATR | ((opcode & 0x0F) << 3)); // Set the OPCODE bits
-    }
-
-    // Set flags (AA, TC, RD) in QOATR byte
-    public void setAA(boolean aa) {
-        QOATR = setBit(QOATR, 2, aa);
-    }
-
-    public void setTC(boolean tc) {
-        QOATR = setBit(QOATR, 1, tc);
-    }
-
-    public void setRD(boolean rd) {
-        QOATR = setBit(QOATR, 0, rd);
-    }
-
-    // Set RA flag in RZR byte
-    public void setRA(boolean ra) {
-        RZR = setBit(RZR, 7, ra);
-    }
-
-    // Set Z (3 bits) in RZR byte
-    public void setZ(int z) {
-        RZR = (byte) (RZR & 0x8F); // Clear Z bits (1110 0000)
-        RZR = (byte) (RZR | ((z & 0x07) << 4)); // Set Z bits
-    }
-
-    // Set RCODE (4 bits) in RZR byte
-    public void setRCODE(int rcode) {
-        RZR = (byte) (RZR & 0xF0); // Clear RCODE bits (0000 1111)
-        RZR = (byte) (RZR | (rcode & 0x0F)); // Set RCODE bits
-    }
-
     // Create the DNS header response as a byte array
     public byte[] getBuffResponse() {
-        ByteBuffer buffer = ByteBuffer.allocate(12)
-                .order(ByteOrder.BIG_ENDIAN)
-                .putShort(ID)          // ID
-                .put(QOATR)            // QR, OPCODE, AA, TC, RD
-                .put(RZR)              // RA, Z, RCODE
-                .putShort(QDCOUNT)     // QDCOUNT
-                .putShort(ANCOUNT)     // ANCOUNT
-                .putShort(NSCOUNT)     // NSCOUNT
-                .putShort(ARCOUNT);    // ARCOUNT
+        ByteBuffer buffer = ByteBuffer.allocate(12).order(ByteOrder.BIG_ENDIAN);
+        buffer.putShort(ID);
 
-        return buffer.array(); // No need to call flip() since array() creates a copy
+        // Construct QOATR byte (QR, OPCODE, AA, TC, RD)
+        byte QOATR = 0;
+        QOATR |= (QR ? 1 << 7 : 0);        // QR (bit 7)
+        QOATR |= (OPCODE & 0x0F) << 3;     // OPCODE (bits 3-6)
+        QOATR |= (AA ? 1 << 2 : 0);        // AA (bit 2)
+        QOATR |= (TC ? 1 << 1 : 0);        // TC (bit 1)
+        QOATR |= (RD ? 1 : 0);             // RD (bit 0)
+        buffer.put(QOATR);
+
+        // Construct RZR byte (RA, Z, RCODE)
+        byte RZR = 0;
+        RZR |= (RA ? 1 << 7 : 0);          // RA (bit 7)
+        RZR |= (Z & 0x07) << 4;            // Z (bits 4-6)
+        RZR |= (RCODE & 0x0F);             // RCODE (bits 0-3)
+        buffer.put(RZR);
+
+        buffer.putShort(QDCOUNT);
+        buffer.putShort(ANCOUNT);
+        buffer.putShort(NSCOUNT);
+        buffer.putShort(ARCOUNT);
+
+        return buffer.array();
     }
 }

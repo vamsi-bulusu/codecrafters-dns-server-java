@@ -32,7 +32,6 @@ public class Handler {
         header.setANCOUNT((short) answerList.size());
         // Build the DNS response packet from the header, questions, and answers
         Packet packet = new Packet(header, questionList, answerList);
-        System.out.println(Arrays.toString(packet.build()));
         return packet.build();
     }
     public static int getAnswerStartPosition(byte[] packet) {

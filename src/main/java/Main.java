@@ -16,9 +16,11 @@ public class Main {
          final DatagramPacket packet = new DatagramPacket(buf, buf.length);
          serverSocket.receive(packet);
 
-//         System.out.println("Received data: " + Arrays.toString(packet.getData()));
+         System.out.println("Received data: " + Arrays.toString(packet.getData()));
 
          byte[] bufResponse = Handler.handle(packet.getData());
+
+         System.out.println("Parsed data: " + Arrays.toString(bufResponse) + " " +  bufResponse.length);
          final DatagramPacket packetResponse = new DatagramPacket(bufResponse, bufResponse.length, packet.getSocketAddress());
          serverSocket.send(packetResponse);
        }
