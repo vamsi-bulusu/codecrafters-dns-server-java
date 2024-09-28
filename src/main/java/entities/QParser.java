@@ -21,16 +21,16 @@ public class QParser {
         byte RZR = buffer.get();
 
         // Set individual flags from the QOATR byte
-        dnsHeader.setQR((QOATR & 0x80) != 0);              // QR is the highest bit (bit 7)
-        dnsHeader.setOPCODE((QOATR >> 3) & 0x0F);          // OPCODE is bits 3-6
-        dnsHeader.setAA((QOATR & 0x04) != 0);              // AA is bit 2
-        dnsHeader.setTC((QOATR & 0x02) != 0);              // TC is bit 1
-        dnsHeader.setRD((QOATR & 0x01) != 0);              // RD is bit 0
+        dnsHeader.setQR((QOATR & 0x80) != 0);  // QR is the highest bit (bit 7)
+        dnsHeader.setOPCODE((QOATR >> 3) & 0x0F); // OPCODE bits 3-6
+        dnsHeader.setAA((QOATR & 0x04) != 0);  // AA is bit 2
+        dnsHeader.setTC((QOATR & 0x02) != 0);  // TC is bit 1
+        dnsHeader.setRD((QOATR & 0x01) != 0);  // RD is bit 0
 
         // Set individual flags from the RZR byte
-        dnsHeader.setRA((RZR & 0x80) != 0);                // RA is the highest bit (bit 7)
-        dnsHeader.setZ((RZR >> 4) & 0x07);                 // Z is bits 4-6
-        dnsHeader.setRCODE(RZR & 0x0F);                    // RCODE is bits 0-3
+        dnsHeader.setRA((RZR & 0x80) != 0);    // RA is the highest bit (bit 7)
+        dnsHeader.setZ((RZR >> 4) & 0x07);     // Z is bits 4-6
+        dnsHeader.setRCODE(RZR & 0x0F);        // RCODE is bits 0-3
 
         // Parse section counts
         dnsHeader.setQDCOUNT(buffer.getShort());
@@ -40,7 +40,6 @@ public class QParser {
 
         return dnsHeader;
     }
-
 
     public static List<Question> parseQuestions(byte[] packet) {
         ByteBuffer buffer = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN);
