@@ -1,6 +1,4 @@
-import entities.DnsHandler;
-import entities.DnsHeader;
-import entities.DnsMessage;
+import entities.Handler;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -17,11 +15,10 @@ public class Main {
          final byte[] buf = new byte[512];
          final DatagramPacket packet = new DatagramPacket(buf, buf.length);
          serverSocket.receive(packet);
+
          System.out.println("Received data: " + Arrays.toString(packet.getData()));
 
-//         byte[] dnsHandler = new DnsHandler(packet.getData());
-         DnsMessage dnsMessage = new DnsMessage(packet.getData());
-         byte[] bufResponse = dnsMessage.getBuffResponse();
+         byte[] bufResponse = Handler.handle(packet.getData());
          final DatagramPacket packetResponse = new DatagramPacket(bufResponse, bufResponse.length, packet.getSocketAddress());
          serverSocket.send(packetResponse);
        }

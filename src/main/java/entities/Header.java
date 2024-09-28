@@ -3,24 +3,22 @@ package entities;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class DnsHeader {
+public class Header {
 
-    // Packet Identifier (ID) - 16 bits
+    // 16-bit Packet Identifier (ID)
     private short ID;
 
-    // 1st byte for QR, OPCODE, AA, TC, RD
-    private byte QOATR;
+    // Flags stored in two bytes
+    private byte QOATR; // QR, OPCODE, AA, TC, RD
+    private byte RZR;   // RA, Z, RCODE
 
-    // 2nd byte for RA, Z, RCODE
-    private byte RZR;
-
-    // 16-bit counts
+    // 16-bit counts for various sections of the DNS packet
     private short QDCOUNT;
     private short ANCOUNT;
     private short NSCOUNT;
     private short ARCOUNT;
 
-    // Getters and setters for each field
+    // Getters and Setters
     public short getID() {
         return ID;
     }
@@ -77,18 +75,13 @@ public class DnsHeader {
         this.ARCOUNT = ARCOUNT;
     }
 
-    // Helper method to set a specific bit in a byte
-    private byte setBit(byte b, int bitPosition, boolean value) {
-        if (value) {
-            return (byte) (b | (1 << bitPosition));
-        } else {
-            return (byte) (b & ~(1 << bitPosition));
-        }
+    // Bit manipulation helper methods
+    private byte setBit(byte b, int position, boolean value) {
+        return value ? (byte) (b | (1 << position)) : (byte) (b & ~(1 << position));
     }
 
-    // Helper method to get the value of a specific bit
-    private boolean getBit(byte b, int bitPosition) {
-        return (b & (1 << bitPosition)) != 0;
+    private boolean getBit(byte b, int position) {
+        return (b & (1 << position)) != 0;
     }
 
     // Set QR flag (1 for response)
@@ -98,11 +91,11 @@ public class DnsHeader {
 
     // Set OPCODE value (4 bits)
     public void setOPCODE(int opcode) {
-        QOATR = (byte) (QOATR & 0x8F); // Clear the OPCODE bits (1111 0000)
+        QOATR = (byte) (QOATR & 0x87); // Clear OPCODE bits (111 0000)
         QOATR = (byte) (QOATR | ((opcode & 0x0F) << 3)); // Set the OPCODE bits
     }
 
-    // Set AA, TC, RD flags (1 bit each)
+    // Set flags (AA, TC, RD) in QOATR byte
     public void setAA(boolean aa) {
         QOATR = setBit(QOATR, 2, aa);
     }
@@ -115,25 +108,25 @@ public class DnsHeader {
         QOATR = setBit(QOATR, 0, rd);
     }
 
-    // Set RA flag (1 bit)
+    // Set RA flag in RZR byte
     public void setRA(boolean ra) {
         RZR = setBit(RZR, 7, ra);
     }
 
-    // Set Z (3 bits)
+    // Set Z (3 bits) in RZR byte
     public void setZ(int z) {
-        RZR = (byte) (RZR & 0x87); // Clear the Z bits (1110 0000)
-        RZR = (byte) (RZR | ((z & 0x07) << 4)); // Set the Z bits
+        RZR = (byte) (RZR & 0x8F); // Clear Z bits (1110 0000)
+        RZR = (byte) (RZR | ((z & 0x07) << 4)); // Set Z bits
     }
 
-    // Set RCODE (4 bits)
+    // Set RCODE (4 bits) in RZR byte
     public void setRCODE(int rcode) {
-        RZR = (byte) (RZR & 0xF0); // Clear the RCODE bits (0000 1111)
-        RZR = (byte) (RZR | (rcode & 0x0F)); // Set the RCODE bits
+        RZR = (byte) (RZR & 0xF0); // Clear RCODE bits (0000 1111)
+        RZR = (byte) (RZR | (rcode & 0x0F)); // Set RCODE bits
     }
 
-    // Function to create a DNS header buffer response
-    public byte[] getBufferResponse() {
+    // Create the DNS header response as a byte array
+    public byte[] getBuffResponse() {
         return ByteBuffer.allocate(12)
                 .order(ByteOrder.BIG_ENDIAN)
                 .putShort(ID)          // ID
