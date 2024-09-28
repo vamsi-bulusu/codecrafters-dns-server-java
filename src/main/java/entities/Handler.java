@@ -3,7 +3,6 @@ package entities;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Handler {
@@ -28,8 +27,8 @@ public class Handler {
             // Add the parsed answer to the answer list
             answerList.add(answer);
         }
-        header.setQDCOUNT((short) questionList.size());
-        header.setANCOUNT((short) answerList.size());
+        header.setQdcount((short) questionList.size());
+        header.setAncount((short) answerList.size());
         // Build the DNS response packet from the header, questions, and answers
         Packet packet = new Packet(header, questionList, answerList);
         return packet.build();

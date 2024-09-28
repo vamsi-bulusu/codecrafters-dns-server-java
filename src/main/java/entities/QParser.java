@@ -10,37 +10,32 @@ public class QParser {
 
     // Method to parse the request packet and create a DNS header response
     public static Header parseHeader(byte[] packet) {
+        if (packet.length < 12) {
+            throw new IllegalArgumentException("Packet must be at least 12 bytes long");
+        }
+
         Header dnsHeader = new Header();
         ByteBuffer buffer = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN);
 
         // Parse Packet ID
-        dnsHeader.setID(buffer.getShort());
+        dnsHeader.setId(buffer.getShort());
 
         // Parse the flags
-        byte QOATR = buffer.get();
-        byte RZR = buffer.get();
+        byte flags1 = buffer.get();
+        byte flags2 = buffer.get();
 
-        // Set individual flags from the QOATR byte
-        dnsHeader.setQR((QOATR & 0x80) != 0);  // QR is the highest bit (bit 7)
-        dnsHeader.setOPCODE((QOATR >> 3) & 0x0F); // OPCODE bits 3-6
-        dnsHeader.setAA((QOATR & 0x04) != 0);  // AA is bit 2
-        dnsHeader.setTC((QOATR & 0x02) != 0);  // TC is bit 1
-        dnsHeader.setRD((QOATR & 0x01) != 0);  // RD is bit 0
-
-        // Set individual flags from the RZR byte
-        dnsHeader.setRA((RZR & 0x80) != 0);    // RA is the highest bit (bit 7)
-        dnsHeader.setZ((RZR >> 4) & 0x07);     // Z is bits 4-6
-        dnsHeader.setRCODE(RZR & 0x0F);        // RCODE is bits 0-3
+        // Set the combined flags
+        dnsHeader.setFlags1(flags1);
+        dnsHeader.setFlags2(flags2);
 
         // Parse section counts
-        dnsHeader.setQDCOUNT(buffer.getShort());
-        dnsHeader.setANCOUNT(buffer.getShort());
-        dnsHeader.setNSCOUNT(buffer.getShort());
-        dnsHeader.setARCOUNT(buffer.getShort());
+        dnsHeader.setQdcount(buffer.getShort());
+        dnsHeader.setAncount(buffer.getShort());
+        dnsHeader.setNscount(buffer.getShort());
+        dnsHeader.setArcount(buffer.getShort());
 
         return dnsHeader;
     }
-
     public static List<Question> parseQuestions(byte[] packet) {
         ByteBuffer buffer = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN);
         List<Question> questions = new ArrayList<>();

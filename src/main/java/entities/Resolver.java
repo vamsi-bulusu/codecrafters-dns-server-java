@@ -39,7 +39,7 @@ public class Resolver {
         ByteBuffer buffer = ByteBuffer.allocate(512); // Standard size for DNS query
 
         // Write header
-        buffer.putShort(header.getID()); // Transaction ID
+        buffer.putShort(header.getId()); // Transaction ID
         buffer.putShort((short) 0x0100); // Standard query with recursion desired
         buffer.putShort((short) 1); // Questions count
         buffer.putShort((short) 0); // Answer RRs
