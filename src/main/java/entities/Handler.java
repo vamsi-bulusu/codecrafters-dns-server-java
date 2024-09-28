@@ -3,6 +3,7 @@ package entities;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Handler {
@@ -31,6 +32,7 @@ public class Handler {
         header.setARCOUNT((short) answerList.size());
         // Build the DNS response packet from the header, questions, and answers
         Packet packet = new Packet(header, questionList, answerList);
+        System.out.println(Arrays.toString(packet.build()));
         return packet.build();
     }
     public static int getAnswerStartPosition(byte[] packet) {

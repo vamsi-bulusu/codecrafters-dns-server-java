@@ -58,12 +58,21 @@ public class Question {
     // Method to encode domain name into DNS label format
     public byte[] encodeDomainName(String domainName) {
         String[] labels = domainName.split("\\.");
-        ByteBuffer buffer = ByteBuffer.allocate(domainName.length() + 2); // +2 for the trailing 0
+        int totalLength = 0;
+
+        // Calculate the total length needed for the buffer
         for (String label : labels) {
-            buffer.put((byte) label.length());  // length byte
-            buffer.put(label.getBytes());       // label bytes
+            totalLength += 1 + label.length(); // 1 for the length byte + label length
+        }
+
+        ByteBuffer buffer = ByteBuffer.allocate(totalLength + 1); // +1 for the trailing 0
+        for (String label : labels) {
+            buffer.put((byte) label.length());  // Length byte
+            buffer.put(label.getBytes());       // Label bytes
         }
         buffer.put((byte) 0); // End of the domain name (null byte)
+
         return buffer.array();
     }
+
 }
