@@ -127,7 +127,7 @@ public class Header {
 
     // Create the DNS header response as a byte array
     public byte[] getBuffResponse() {
-        return ByteBuffer.allocate(12)
+        ByteBuffer buffer = ByteBuffer.allocate(12)
                 .order(ByteOrder.BIG_ENDIAN)
                 .putShort(ID)          // ID
                 .put(QOATR)            // QR, OPCODE, AA, TC, RD
@@ -135,7 +135,8 @@ public class Header {
                 .putShort(QDCOUNT)     // QDCOUNT
                 .putShort(ANCOUNT)     // ANCOUNT
                 .putShort(NSCOUNT)     // NSCOUNT
-                .putShort(ARCOUNT)     // ARCOUNT
-                .array();
+                .putShort(ARCOUNT);    // ARCOUNT
+
+        return buffer.array(); // No need to call flip() since array() creates a copy
     }
 }

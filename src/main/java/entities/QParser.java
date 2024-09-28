@@ -27,16 +27,16 @@ public class QParser {
         int opcode = (dnsHeader.getQOATR() >> 3) & 0x0F; // Extract OPCODE from the QOATR
         dnsHeader.setOPCODE(opcode);
 
-        // Set static values for AA, TC, RA, and Z
+        // Set static values for AA, TC, RA, and Z based on your requirements
         dnsHeader.setAA(false);  // Set AA to 0
         dnsHeader.setTC(false);  // Set TC to 0
         dnsHeader.setRA(false);  // Set RA to 0
         dnsHeader.setZ(0);       // Set Z to 0
 
-        // Mimic RCODE based on the OPCODE value
-        dnsHeader.setRCODE(opcode == 0 ? 0 : 4);  // RCODE: 0 for standard query, else 4 (not implemented)
+        // Set RCODE based on specific logic or error state
+        dnsHeader.setRCODE(0);   // Assuming 0 for no error; adjust logic as necessary
 
-        // Set QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT to example values
+        // Set QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT based on your logic
         dnsHeader.setQDCOUNT((short) 0);  // Example value, adjust as necessary
         dnsHeader.setANCOUNT((short) 0);
         dnsHeader.setNSCOUNT((short) 0);
