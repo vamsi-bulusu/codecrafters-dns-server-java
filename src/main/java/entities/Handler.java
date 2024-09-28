@@ -29,7 +29,7 @@ public class Handler {
             answerList.add(answer);
         }
         header.setQDCOUNT((short) questionList.size());
-        header.setARCOUNT((short) answerList.size());
+        header.setANCOUNT((short) answerList.size());
         // Build the DNS response packet from the header, questions, and answers
         Packet packet = new Packet(header, questionList, answerList);
         System.out.println(Arrays.toString(packet.build()));
