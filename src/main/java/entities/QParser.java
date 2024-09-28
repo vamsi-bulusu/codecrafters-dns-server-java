@@ -37,8 +37,8 @@ public class QParser {
         dnsHeader.setRCODE(opcode == 0 ? 0 : 4);  // RCODE: 0 for standard query, else 4 (not implemented)
 
         // Set QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT to example values
-        dnsHeader.setQDCOUNT((short) 1);  // Example value, adjust as necessary
-        dnsHeader.setANCOUNT((short) 1);
+        dnsHeader.setQDCOUNT((short) 0);  // Example value, adjust as necessary
+        dnsHeader.setANCOUNT((short) 0);
         dnsHeader.setNSCOUNT((short) 0);
         dnsHeader.setARCOUNT((short) 0);
 
@@ -74,10 +74,9 @@ public class QParser {
         return questions;
     }
 
-    // New helper method to parse domain names, including compression
+    // Helper method to parse domain names, including compression
     private static String parseDomainName(byte[] packet, ByteBuffer buffer) {
         StringBuilder domainName = new StringBuilder();
-        int initialPosition = buffer.position(); // Store the initial position
 
         while (true) {
             byte length = buffer.get(); // Get the length of the next label
@@ -87,8 +86,11 @@ public class QParser {
                 // Read the pointer offset
                 int pointerOffset = ((length & 0x3F) << 8) | (buffer.get() & 0xFF);
                 // Move buffer to the position pointed to by the pointer
-                buffer.position(pointerOffset);
-                continue; // Continue parsing the domain name from the new position
+                ByteBuffer newBuffer = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN);
+                newBuffer.position(pointerOffset);
+                // Parse the domain name from the new position
+                domainName.append(parseDomainName(packet, newBuffer));
+                break; // Exit since we've now parsed the domain name
             }
 
             // If length is zero, end of the domain name
@@ -101,9 +103,6 @@ public class QParser {
             buffer.get(label); // Get the label bytes
             domainName.append(new String(label)).append(".");
         }
-
-        // Restore the initial buffer position if a pointer was followed
-        buffer.position(initialPosition);
 
         // Remove the trailing dot from the domain name
         if (!domainName.isEmpty()) {
