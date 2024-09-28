@@ -9,9 +9,8 @@ public class DnsMessage {
 
     public DnsMessage(byte[] dnsPacket){
         byte[] dnsHeader = DnsParser.parseHeader(Arrays.copyOf(dnsPacket, 12)).getBufferResponse();
-        byte[] dnsQuestion = new DnsQuestion().getBuffResponse();
-//        byte[] dnsAnswer = new DnsAnswer().getBuffResponse();
-        byte[] dnsAnswer = new DnsResourceRecord().getBuffResponse();
+        byte[] dnsQuestion = DnsParser.parseQuestion(Arrays.copyOfRange(dnsPacket, 12, dnsPacket.length)).getBuffResponse();
+        byte[] dnsAnswer = DnsParser.parseAnswer(dnsQuestion).getBuffResponse();
         buffResponse = ByteBuffer.allocate(512)
                 .order(ByteOrder.BIG_ENDIAN)
                 .put(dnsHeader)

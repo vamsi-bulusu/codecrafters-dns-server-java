@@ -2,6 +2,7 @@ package entities;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class DnsParser {
 
@@ -41,4 +42,54 @@ public class DnsParser {
 
         return dnsHeader;
     }
+
+    public static DnsQuestion parseQuestion(byte[] packet) {
+        ByteBuffer buffer = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN);
+        buffer.position(0);  // Set buffer to start at the question section
+        DnsQuestion dnsQuestion = new DnsQuestion();
+
+        // Parse Domain Name
+        int startPos = buffer.position();
+        StringBuilder domainName = new StringBuilder();
+
+        while (true) {
+            byte length = buffer.get();  // Get the length of the next label
+            if (length == 0) {
+                // End of the domain name
+                break;
+            }
+
+            byte[] label = new byte[length];
+            buffer.get(label);  // Get the label bytes
+            domainName.append(new String(label)).append(".");
+        }
+
+        // Calculate the total length of the domain name (from startPos to current buffer position)
+        int domainLength = buffer.position() - startPos;
+        byte[] domainBytes = Arrays.copyOfRange(packet, startPos, startPos + domainLength);
+
+        // Set the domain name as byte array
+        dnsQuestion.setName(domainBytes);
+
+        // Parse Type (16 bits)
+        dnsQuestion.setType(buffer.getShort());
+
+        // Parse Class (16 bits)
+        dnsQuestion.setQClass(buffer.getShort());
+
+        return dnsQuestion;
+    }
+
+    public static DnsResourceRecord parseAnswer(byte[] packet){
+        DnsQuestion dnsQuestion = parseQuestion(packet);
+        DnsResourceRecord dnsResourceRecord = new DnsResourceRecord();
+        dnsResourceRecord.setName(dnsQuestion.getName());
+        dnsResourceRecord.setType(dnsQuestion.getType());
+        dnsResourceRecord.setClass(dnsQuestion.getQClass());
+        dnsResourceRecord.setTTL(60);
+        dnsResourceRecord.setRDLENGTH((short) 4);
+        dnsResourceRecord.setRData(new byte[]{1, 56, 1, 56, 1, 56, 1, 56, 0});
+        return dnsResourceRecord;
+    }
+
 }
