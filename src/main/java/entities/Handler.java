@@ -17,6 +17,10 @@ public class Handler {
         // Create a list to store the answers
         List<Answer> answerList = new ArrayList<>();
 
+        header.setQdcount((short) questionList.size());
+        header.setAncount((short) questionList.size());
+        header.setQR(true);
+
         // For each question, resolve the answer and parse it
         for (Question question : questionList) {
             // Use Resolver to get the response for this question
@@ -24,12 +28,8 @@ public class Handler {
 //            Answer answer = QParser.parseAnswer(response, getAnswerStartPosition(response));
             Answer answer = Resolver.createDummyAnswer(question);
             // Parse the answer from the response packet
-
             // Add the parsed answer to the answer list
             answerList.add(answer);
-            header.setQdcount((short) questionList.size());
-            header.setAncount((short) answerList.size());
-
             packets.add(new Packet(header, question, answer));
         }
         header.setQdcount((short) questionList.size());
