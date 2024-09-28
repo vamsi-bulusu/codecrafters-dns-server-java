@@ -20,7 +20,7 @@ public class Handler {
         header.setQdcount((short) questionList.size());
         header.setAncount((short) questionList.size());
         header.setQR(true);
-        header.setRcode(header.getRcode());
+        header.setRcode((byte) 4);
 
         // For each question, resolve the answer and parse it
         for (Question question : questionList) {
