@@ -18,8 +18,9 @@ public class Packet {
     public byte[] build(){
         // put header
         ByteBuffer byteBuffer = ByteBuffer.allocate(512)
-                .order(ByteOrder.BIG_ENDIAN)
-                .put(header.getBuffResponse());
+                .order(ByteOrder.BIG_ENDIAN);
+
+        byteBuffer.put(header.getBuffResponse());
         // put questionList
         for(Question question: questionList){
             byteBuffer = byteBuffer.put(question.getBuffResponse());
