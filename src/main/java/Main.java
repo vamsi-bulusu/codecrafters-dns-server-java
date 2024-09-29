@@ -14,7 +14,7 @@ public class Main {
     public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.out.println("Logs from your program will appear here!");
-        String[] serverAddress = args[0].split(":");
+        String[] serverAddress = args[1].split(":");
         InetSocketAddress dnsServerAddress = new InetSocketAddress(serverAddress[0], Integer.parseInt(serverAddress[1]));
         try (DatagramSocket serverSocket = new DatagramSocket(2053)) {
             while (true) {
