@@ -8,69 +8,59 @@ public class Question {
     private short QClass;
 
     public Question() {
-    }
 
-    public Question(String name, short type, short qClass) {
-        this.Name = name;
-        this.Type = type;
-        this.QClass = qClass;
-    }
-
-    // Getter and Setter methods
-    public String getName() {
-        return Name;
     }
 
     public void setName(String name) {
-        this.Name = name;
+        Name = name;
+    }
+
+    public void setType(short type) {
+        Type = type;
+    }
+
+    public void setQClass(short QClass) {
+        this.QClass = QClass;
+    }
+
+    public String getName() {
+        return Name;
     }
 
     public short getType() {
         return Type;
     }
 
-    public void setType(short type) {
-        this.Type = type;
-    }
-
     public short getQClass() {
         return QClass;
     }
 
-    public void setQClass(short qClass) {
-        this.QClass = qClass;
-    }
-
-    // Helper method to convert the question to bytes for response building
-    public byte[] getBuffResponse() {
-        // Convert the domain name to byte array using the DNS label format
+    public ByteBuffer getByteBuff() {
         byte[] nameBytes = encodeDomainName(Name);
-
-        // Create a buffer to store the name + type + class (2 bytes each for type and class)
         ByteBuffer buffer = ByteBuffer.allocate(nameBytes.length + 4);
         buffer.put(nameBytes);
-        buffer.putShort(Type);   // 2 bytes for the type
-        buffer.putShort(QClass); // 2 bytes for the class
+        buffer.putShort(Type);
+        buffer.putShort(QClass);
 
-        return buffer.array();
+        return buffer;
     }
 
-    // Method to encode domain name into DNS label format
+
     public byte[] encodeDomainName(String domainName) {
         String[] labels = domainName.split("\\.");
         int totalLength = 0;
 
         // Calculate the total length needed for the buffer
         for (String label : labels) {
-            totalLength += 1 + label.length(); // 1 for the length byte + label length
+            totalLength += 1 + label.length();
         }
 
-        ByteBuffer buffer = ByteBuffer.allocate(totalLength + 1); // +1 for the trailing 0
+        ByteBuffer buffer = ByteBuffer.allocate(totalLength + 1);
         for (String label : labels) {
-            buffer.put((byte) label.length());  // Length byte
-            buffer.put(label.getBytes());       // Label bytes
+            buffer.put((byte) label.length());
+            buffer.put(label.getBytes());
         }
-        buffer.put((byte) 0); // End of the domain name (null byte)
+        buffer.put((byte) 0);
 
         return buffer.array();
     }
