@@ -1,6 +1,7 @@
 import entities.DnsQuery;
 import entities.DnsResponse;
 import entities.Header;
+import entities.Question;
 import util.DnsUtil;
 
 import java.io.IOException;
@@ -34,9 +35,9 @@ public class Main {
                 resolverQuery.setHeader(new Header(query.getHeader()));
                 resolverQuery.getHeader().setQdcount((short) 1);
 
-                for(int i = 0; i < query.getHeader().getQdcount(); i++){
+                for(Question question: query.getQuestions()){
 
-                    resolverQuery.getQuestions().add(query.getQuestions().get(i));
+                    resolverQuery.getQuestions().add(question);
                     byte[] resolverPacket = DnsUtil.writeQueryBytes(resolverQuery).array();
                     DatagramPacket dnsQueryPacket = new DatagramPacket(resolverPacket, resolverPacket.length, dnsServerAddress);
                     DatagramSocket forwardSocket = new DatagramSocket();
