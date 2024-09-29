@@ -1,5 +1,6 @@
 package entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DnsQuery {
@@ -9,6 +10,7 @@ public class DnsQuery {
     private List<Question> questions;
 
     public DnsQuery(){
+        this.questions = new ArrayList<>();
     }
 
     public Header getHeader() {
