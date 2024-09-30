@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Arrays;
 
 public class Main {
@@ -19,7 +20,7 @@ public class Main {
         // Split server address and port
         String[] serverAddress = args[1].split(":");
         System.out.println(Arrays.toString(serverAddress));
-        InetSocketAddress dnsServerAddress = new InetSocketAddress(serverAddress[0], Integer.parseInt(serverAddress[1]));
+        SocketAddress dnsServerAddress = new InetSocketAddress(serverAddress[0], Integer.parseInt(serverAddress[1]));
 
         try (DatagramSocket serverSocket = new DatagramSocket(2053);
              DatagramSocket forwardSocket = new DatagramSocket()) {
