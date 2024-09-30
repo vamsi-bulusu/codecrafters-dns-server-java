@@ -63,7 +63,7 @@ public class Main {
 
                     // If answers are present, add them to the response
                     if (!resolverResponse.getAnswers().isEmpty()) {
-                        response.getAnswers().addAll(resolverResponse.getAnswers());
+                        response.getAnswers().add(resolverResponse.getAnswers().getFirst());
                     }
                 }
 
