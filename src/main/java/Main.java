@@ -68,7 +68,7 @@ public class Main {
                 }
 
                 // Set the correct answer count (Ancount)
-                response.getHeader().setAncount((short) response.getAnswers().size());
+                response.getHeader().setAncount((short) response.getQuestions().size());
 
                 // Send the final response back to the client
                 byte[] responsePacket = DnsUtil.writeResponseBytes(response).array();
