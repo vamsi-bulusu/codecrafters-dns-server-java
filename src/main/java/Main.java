@@ -19,12 +19,9 @@ public class Main {
 
         // Split server address and port
         String[] serverAddress = args[1].split(":");
-        System.out.println(Arrays.toString(serverAddress));
         SocketAddress dnsServerAddress = new InetSocketAddress(serverAddress[0], Integer.parseInt(serverAddress[1]));
 
-        try (DatagramSocket serverSocket = new DatagramSocket(2053);
-             DatagramSocket forwardSocket = new DatagramSocket()) {
-
+        try (DatagramSocket serverSocket = new DatagramSocket(2053)) {
             // Main loop for processing DNS queries
             while (true) {
                 // Buffer to receive incoming DNS requests
@@ -54,12 +51,12 @@ public class Main {
                     // Send query to upstream DNS server
                     byte[] resolverPacket = DnsUtil.writeQueryBytes(resolverQuery).array();
                     DatagramPacket dnsQueryPacket = new DatagramPacket(resolverPacket, resolverPacket.length, dnsServerAddress);
-                    forwardSocket.send(dnsQueryPacket);  // Send to upstream
+                    serverSocket.send(dnsQueryPacket);  // Send to upstream
 
                     // Receive the response from upstream DNS server
                     byte[] responseBuffer = new byte[512];
                     DatagramPacket dnsResponsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
-                    forwardSocket.receive(dnsResponsePacket);  // Get response
+                    serverSocket.receive(dnsResponsePacket);  // Get response
 
                     // Parse upstream response
                     DnsResponse resolverResponse = DnsUtil.readResponse(dnsResponsePacket.getData());
@@ -78,9 +75,9 @@ public class Main {
                 DatagramPacket packetResponse = new DatagramPacket(responsePacket, responsePacket.length, packet.getSocketAddress());
                 serverSocket.send(packetResponse);  // Send the response back to client
             }
-
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
         }
     }
 }
+
