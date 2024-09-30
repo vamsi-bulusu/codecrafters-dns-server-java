@@ -110,7 +110,7 @@ public class DnsUtil {
 
     public static ByteBuffer writeResponseBytes(DnsResponse response){
         ByteBuffer buffer = ByteBuffer.allocate(512).order(ByteOrder.BIG_ENDIAN);
-        buffer.put(response.getHeader().getByteBuff().array());
+        buffer.put(response.getHeader().getByteBuff());
         for(int i = 0; i < response.getHeader().getQdcount(); i++){
             buffer.put(response.getQuestions().get(i).getByteBuff());
         }
