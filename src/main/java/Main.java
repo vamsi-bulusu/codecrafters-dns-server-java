@@ -18,6 +18,7 @@ public class Main {
 
         // Split server address and port
         String[] serverAddress = args[1].split(":");
+        System.out.println(Arrays.toString(serverAddress));
         InetSocketAddress dnsServerAddress = new InetSocketAddress(serverAddress[0], Integer.parseInt(serverAddress[1]));
 
         try (DatagramSocket serverSocket = new DatagramSocket(2053);
@@ -40,12 +41,13 @@ public class Main {
                 response.setHeader(new Header(query.getHeader()));
                 response.setQuestions(query.getQuestions());
 
+                DnsQuery resolverQuery = new DnsQuery();
+                resolverQuery.setHeader(new Header(query.getHeader())); // Copy header
+                resolverQuery.getHeader().setQdcount((short) 1); // Only forward one question
                 // Forward query to upstream DNS server for each question
                 for (Question question : query.getQuestions()) {
                     // Prepare resolver query
-                    DnsQuery resolverQuery = new DnsQuery();
-                    resolverQuery.setHeader(new Header(query.getHeader())); // Copy header
-                    resolverQuery.getHeader().setQdcount((short) 1); // Only forward one question
+
                     resolverQuery.getQuestions().add(question);  // Add question
 
                     // Send query to upstream DNS server
