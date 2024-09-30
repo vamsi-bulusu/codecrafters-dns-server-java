@@ -14,6 +14,18 @@ public class Answer extends Question {
         this.rdlength = 4;
     }
 
+    public int getTtl() {
+        return ttl;
+    }
+
+    public short getRdlength() {
+        return rdlength;
+    }
+
+    public byte[] getrData() {
+        return rData;
+    }
+
     public void setTtl(int ttl) {
         this.ttl = ttl;
     }
@@ -24,16 +36,6 @@ public class Answer extends Question {
 
     public void setrData(byte[] rData) {
         this.rData = rData;
-    }
-
-    public ByteBuffer getByteBuff() {
-        byte[] question = super.getByteBuff().array();
-        int totalSize = question.length + 10 + rData.length;
-        return ByteBuffer.allocate(totalSize)
-                .put(question)
-                .putInt(ttl)
-                .putShort(rdlength)
-                .put(rData);
     }
 
 }

@@ -1,5 +1,8 @@
 package entities;
 
+import util.DnsUtil;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +30,12 @@ public class DnsResponse extends DnsQuery {
         short rcode = (opcode == 0) ? (short)0 : 0x0004;  // Binary: 0000 0000 0000 0100
         flags = (short) (qr | opcode | rd | rcode);
         header.setFlags(flags);
+    }
+
+    public ByteBuffer byteBuffer(){
+        ByteBuffer buffer = super.byteBuffer();
+        DnsUtil.writeAnswers(buffer, answers);
+        return buffer;
     }
 
 }

@@ -14,17 +14,15 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String[] args) {
-        // Logs for debugging
-        System.out.println("Logs from your program will appear here!");
 
         // Split server address and port
         String[] serverAddress = args[1].split(":");
         SocketAddress dnsServerAddress = new InetSocketAddress(serverAddress[0], Integer.parseInt(serverAddress[1]));
 
         try (DatagramSocket serverSocket = new DatagramSocket(2053)) {
-            // Main loop for processing DNS queries
+
             while (true) {
-                // Buffer to receive incoming DNS requests
+
                 byte[] buf = new byte[512];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 serverSocket.receive(packet);  // Receive incoming query
@@ -40,8 +38,9 @@ public class Main {
                 response.setQuestions(query.getQuestions());
 
                 DnsQuery resolverQuery = new DnsQuery();
-                resolverQuery.setHeader(new Header(query.getHeader())); // Copy header
+                resolverQuery.setHeader(new Header(query.getHeader()));
                 resolverQuery.getHeader().setQdcount((short) 1); // Only forward one question
+
                 // Forward query to upstream DNS server for each question
                 for (Question question : query.getQuestions()) {
                     // Prepare resolver query
@@ -49,29 +48,30 @@ public class Main {
                     resolverQuery.getQuestions().add(question);  // Add question
 
                     // Send query to upstream DNS server
-                    byte[] resolverPacket = DnsUtil.writeQueryBytes(resolverQuery).array();
-                    DatagramPacket dnsQueryPacket = new DatagramPacket(resolverPacket, resolverPacket.length, dnsServerAddress);
-                    serverSocket.send(dnsQueryPacket);  // Send to upstream
+                    byte[] resolverQBytes = resolverQuery.byteBuffer().array();
+                    DatagramPacket resolverPacket = new DatagramPacket(resolverQBytes, resolverQBytes.length, dnsServerAddress);
+                    serverSocket.send(resolverPacket);  // Send to upstream
 
                     // Receive the response from upstream DNS server
-                    byte[] responseBuffer = new byte[512];
-                    DatagramPacket dnsResponsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
-                    serverSocket.receive(dnsResponsePacket);  // Get response
+                    byte[] resolverRBytes = new byte[512];
+                    DatagramPacket resolverResponsePacket = new DatagramPacket(resolverRBytes, resolverRBytes.length);
+                    serverSocket.receive(resolverResponsePacket);  // Get response
 
                     // Parse upstream response
-                    DnsResponse resolverResponse = DnsUtil.readResponse(dnsResponsePacket.getData());
+                    DnsResponse resolverResponse = DnsUtil.readResponse(resolverResponsePacket.getData());
 
                     // If answers are present, add them to the response
                     if (!resolverResponse.getAnswers().isEmpty()) {
                         response.getAnswers().add(resolverResponse.getAnswers().getFirst());
                     }
+                    resolverQuery.getQuestions().clear();
                 }
 
                 // Set the correct answer count (Ancount)
-                response.getHeader().setAncount((short) response.getQuestions().size());
+                response.getHeader().setAncount(response.getHeader().getQdcount());
 
                 // Send the final response back to the client
-                byte[] responsePacket = DnsUtil.writeResponseBytes(response).array();
+                byte[] responsePacket = response.byteBuffer().array();
                 DatagramPacket packetResponse = new DatagramPacket(responsePacket, responsePacket.length, packet.getSocketAddress());
                 serverSocket.send(packetResponse);  // Send the response back to client
             }

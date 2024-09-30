@@ -4,6 +4,7 @@ import entities.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DnsUtil {
@@ -99,25 +100,33 @@ public class DnsUtil {
         return domainName.toString();
     }
 
-    public static ByteBuffer writeQueryBytes(DnsQuery query){
-        ByteBuffer buffer = ByteBuffer.allocate(512).order(ByteOrder.BIG_ENDIAN);
-        buffer.put(query.getHeader().getByteBuff().array());
-        for(int i = 0; i < query.getHeader().getQdcount(); i++){
-            buffer.put(query.getQuestions().get(i).getByteBuff());
-        }
-        return buffer;
+    public static void writeHeader(ByteBuffer byteBuffer, Header header) {
+        byteBuffer.putShort(header.getId());
+        byteBuffer.putShort(header.getFlags());
+        byteBuffer.putShort(header.getQdcount());
+        byteBuffer.putShort(header.getAncount());
+        byteBuffer.putShort(header.getNscount());
+        byteBuffer.putShort(header.getArcount());
     }
 
-    public static ByteBuffer writeResponseBytes(DnsResponse response){
-        ByteBuffer buffer = ByteBuffer.allocate(512).order(ByteOrder.BIG_ENDIAN);
-        buffer.put(response.getHeader().getByteBuff());
-        for(int i = 0; i < response.getHeader().getQdcount(); i++){
-            buffer.put(response.getQuestions().get(i).getByteBuff());
+    public static void writeQuestions(ByteBuffer byteBuffer, List<Question> questions) {
+        for (Question question : questions) {
+            byteBuffer.put(question.encodeDomainName(question.getName()));
+            byteBuffer.putShort(question.getType());
+            byteBuffer.putShort(question.getQClass());
         }
-        for(int i = 0; i < response.getHeader().getQdcount(); i++){
-            buffer.put(response.getAnswers().get(i).getByteBuff());
+    }
+
+    public static void writeAnswers(ByteBuffer byteBuffer, List<Answer> answers) {
+        for (Answer answer : answers) {
+            byteBuffer.put(answer.encodeDomainName(answer.getName()));
+            byteBuffer.putShort(answer.getType());
+            byteBuffer.putShort(answer.getQClass());
+            byteBuffer.putInt(answer.getTtl());
+            byteBuffer.putShort(answer.getRdlength());
+            byte[] rDataBytes = answer.getrData();
+            byteBuffer.put(Arrays.copyOf(rDataBytes, rDataBytes.length));
         }
-        return buffer;
     }
 
 }
